@@ -1,22 +1,37 @@
 {
   "name": "koishi-plugin-theme-doki",
   "description": "Doki Theme for Koishi Console",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
+  "scripts": {
+    "generate": "ts-node ./scripts/generate-theme.ts"
+  },
   "files": [
     "lib",
     "dist"
   ],
   "license": "MIT",
-  "scripts": {},
   "keywords": [
     "chatbot",
     "koishi",
     "plugin"
   ],
-  "devDependencies": {},
+  "koishi": {
+    "description": {
+      "zh": "把你喜欢的二次元老婆主题应用到 Koishi 上！"
+    },
+    "locales": [
+      "zh"
+    ]
+  },
   "peerDependencies": {
     "koishi": "^4.17.1"
+  },
+  "devDependencies": {
+    "octokit": "^3.1.2",
+    "prettier": "^3.2.5",
+    "semaphore-promise": "^1.4.2",
+    "ts-node": "^10.9.2"
   }
 }
