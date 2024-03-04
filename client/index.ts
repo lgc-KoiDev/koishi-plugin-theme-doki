@@ -61,12 +61,12 @@ export const DokiThemeConfig: Schema<DokiThemeConfig> = Schema.intersect([
           .default(0.5)
           .description("贴纸透明度。"),
         stickerXOffset: Schema.number()
-          .min(0)
+          .min(-100)
           .max(100)
           .default(0)
           .description("贴纸水平偏移百分比。"),
         stickerYOffset: Schema.number()
-          .min(0)
+          .min(-100)
           .max(100)
           .default(0)
           .description("贴纸垂直偏移百分比。"),
@@ -167,7 +167,7 @@ export default function apply(ctx: Context) {
     };
 
     watchEffect(() => {
-      if (store.wallpaper) unsetWallpaper();
+      if (store.wallpaper) return;
 
       const themeUsing = config.value.theme[colorMode.value];
       const assetsInfo = assetNameMap[themeUsing];
