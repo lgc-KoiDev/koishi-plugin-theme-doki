@@ -36,7 +36,7 @@ export const DokiThemeConfig: Schema<DokiThemeConfig> = Schema.intersect([
           .min(0.3)
           .max(1)
           .step(0.01)
-          .default(0.9)
+          .default(0.95)
           .description("控制台透明度。"),
       }),
       Schema.object({}),
@@ -60,16 +60,12 @@ export const DokiThemeConfig: Schema<DokiThemeConfig> = Schema.intersect([
           .step(0.01)
           .default(0.5)
           .description("贴纸透明度。"),
-        stickerXOffset: Schema.number()
-          .min(-100)
-          .max(100)
-          .default(0)
-          .description("贴纸水平偏移百分比。"),
-        stickerYOffset: Schema.number()
-          .min(-100)
-          .max(100)
-          .default(0)
-          .description("贴纸垂直偏移百分比。"),
+        stickerXOffset: Schema.string()
+          .default("0px")
+          .description("贴纸水平偏移量（使用 CSS 单位）。"),
+        stickerYOffset: Schema.string()
+          .default("0px")
+          .description("贴纸垂直偏移量（使用 CSS 单位）。"),
       }),
       Schema.object({}),
     ]),
@@ -158,7 +154,7 @@ export default function apply(ctx: Context) {
 
       elem.style.backgroundImage = `url('${resBaseUrl}/stickers/vscode/${info.path}/${name}')`;
       elem.style.opacity = `${dokiConf.stickerOpacity}`;
-      elem.style.backgroundPosition = `bottom ${dokiConf.stickerYOffset}% right ${dokiConf.stickerXOffset}%`;
+      elem.style.backgroundPosition = `bottom ${dokiConf.stickerYOffset} right ${dokiConf.stickerXOffset}`;
       body.appendChild(elem);
     };
 
@@ -185,7 +181,7 @@ export default function apply(ctx: Context) {
     });
 
     ctx.on("dispose", () => {
-      unsetWallpaper();
+      if (!store.wallpaper) unsetWallpaper();
       unsetSticker();
     });
   });
