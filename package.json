@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
+    "build": "tsc -b && koishi-console build",
     "generate": "ts-node ./scripts/generate-theme.ts"
   },
   "files": [
@@ -21,17 +22,26 @@
     "description": {
       "zh": "把你喜欢的二次元老婆主题应用到 Koishi 上！"
     },
-    "locales": [
-      "zh"
-    ]
+    "services": {
+      "required": [
+        "console"
+      ]
+    }
   },
   "peerDependencies": {
+    "@koishijs/plugin-console": "^5.17.0",
     "koishi": "^4.17.1"
   },
   "devDependencies": {
+    "@koishijs/client": "^5.17.0",
+    "@koishijs/plugin-console": "^5.17.0",
+    "@vueuse/core": "^10.9.0",
+    "cosmokit": "^1.5.2",
+    "koishi-plugin-wallpaper": "^1.0.4",
     "octokit": "^3.1.2",
-    "prettier": "^3.2.5",
     "semaphore-promise": "^1.4.2",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "vue": "^3.4.21"
   }
 }

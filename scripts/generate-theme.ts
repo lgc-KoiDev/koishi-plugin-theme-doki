@@ -1,13 +1,10 @@
-import { exec } from "child_process";
 import fs from "fs";
 import { writeFile } from "fs/promises";
 import { join } from "path";
-import { promisify } from "util";
 
+import { pick } from "cosmokit";
 import { Octokit } from "octokit";
 import { Semaphore } from "semaphore-promise";
-
-const execAsync = promisify(exec);
 
 const ghAuth = process.env.GITHUB_TOKEN;
 if (ghAuth) console.log(`using token, length: ${ghAuth.length}`);
@@ -16,10 +13,13 @@ const gh = new Octokit({ auth: ghAuth });
 const rootDir = join(__dirname, "..");
 const indexCssDir = join(rootDir, "client");
 const themeCssDir = join(rootDir, "client", "themes");
-if (!fs.existsSync(indexCssDir)) fs.mkdirSync(indexCssDir, { recursive: true });
-if (!fs.existsSync(themeCssDir)) fs.mkdirSync(themeCssDir, { recursive: true });
+
 const indexCssPath = join(indexCssDir, "index.scss");
-const indexTsPath = join(indexCssDir, "index.ts");
+const themeTsPath = join(indexCssDir, "theme.ts");
+
+if (!fs.existsSync(indexCssDir)) fs.mkdirSync(indexCssDir, { recursive: true });
+if (fs.existsSync(themeCssDir)) fs.rmSync(themeCssDir, { recursive: true });
+fs.mkdirSync(themeCssDir, { recursive: true });
 
 const themeTemplate = fs.readFileSync(join(__dirname, "template.scss"), {
   encoding: "utf-8",
@@ -27,13 +27,15 @@ const themeTemplate = fs.readFileSync(join(__dirname, "template.scss"), {
 
 interface StickerInfo {
   name: string;
+  anchor: "left" | "center" | "right";
 }
 
 interface ThemeDef {
+  $url: string;
   name: string;
   group: string;
+  dark: boolean;
   stickers: { default: StickerInfo; secondary?: StickerInfo };
-  overrides?: { editorScheme?: { colors?: { accentColor?: string } } };
   colors: {
     baseBackground: string;
     secondaryBackground: string;
@@ -46,18 +48,8 @@ interface ThemeDef {
     selectionForeground: string;
     accentColorTransparent: string;
     selectionBackground: string;
-    constantColor: string;
-    unusedColor: string;
-    classNameColor: string;
-    htmlTagColor: string;
-    stringColor: string;
-    keyColor: string;
-    keywordColor: string;
-    infoForeground: string;
-    comments: string;
     identifierHighlight: string;
     selectionInactive: string;
-    baseIconColor: string;
   };
 }
 
@@ -74,8 +66,8 @@ async function getThemeDefs(): Promise<ThemeDef[]> {
         .filter((x) => /^definitions.*\.json/.test(x.path))
         .map(
           (x) =>
-            `https://raw.githubusercontent.com/doki-theme/doki-master-theme/master/${x.path}`,
-        ),
+            `https://raw.githubusercontent.com/doki-theme/doki-master-theme/master/${x.path}`
+        )
     );
 
   console.log(`Found ${urls.length} theme definitions`);
@@ -85,25 +77,28 @@ async function getThemeDefs(): Promise<ThemeDef[]> {
       sem.acquire().then((release) =>
         fetch(url)
           .then((data) => data.json())
+          .then((data) => ({ ...data, $url: url }))
           .catch((e) => {
             console.error(`Failed to fetch ${url}`);
             throw e;
           })
-          .finally(release),
-      ),
-    ),
+          .finally(release)
+      )
+    )
   );
 }
 
 interface KoishiThemeDef {
+  $original: ThemeDef;
+
   name: string;
   id: string;
 
-  bg0: string;
+  // bg0: string;
   bg1: string;
   bg2: string;
   bg3: string;
-  fg0: string;
+  // fg0: string;
   fg1: string;
   fg2: string;
   fg3: string;
@@ -122,38 +117,34 @@ interface KoishiThemeDef {
   selectionHighlightBackground: string;
   lineHighlightBackground: string;
   lineHighlightBorder: string;
-
-  arrayForeground: string;
-  constantForeground: string;
-  enumeratorMemberForeground: string;
-  booleanForeground: string;
-  classForeground: string;
-  enumeratorForeground: string;
-  fieldForeground: string;
-  constructorForeground: string;
-  functionForeground: string;
-  colorForeground: string;
-  eventForeground: string;
-  fileForeground: string;
-  folderForeground: string;
-  interfaceForeground: string;
 }
 
 function transformThemeDef(data: ThemeDef): KoishiThemeDef {
   const c = data.colors;
-  const editorAccent =
-    data.overrides?.editorScheme?.colors?.accentColor ?? c.accentColor;
-  return {
-    name: data.name,
-    id:
-      `doki-` +
-      `${data.name.toLowerCase().replace(/(^[0-9]+)|[^a-zA-Z0-9]/g, "-")}`,
 
-    bg0: c.secondaryBackground,
-    bg1: c.baseBackground,
-    bg2: c.headerColor,
-    bg3: c.textEditorBackground,
-    fg0: c.selectionForeground,
+  const idBase = data.name.toLowerCase().replace(/[^a-zA-Z0-9]/g, "-");
+  const noSfx = idBase.endsWith("dark") || idBase.endsWith("light");
+  const sfx = `-${data.dark ? "dark" : "light"}`;
+  const id = `doki-${idBase}${noSfx ? "" : sfx}`;
+
+  return {
+    $original: data,
+
+    name: `${data.group}: ${data.name}`,
+    id,
+
+    ...(data.dark
+      ? {
+          bg1: c.baseBackground,
+          bg2: c.headerColor,
+          bg3: c.textEditorBackground,
+        }
+      : {
+          // light theme should reverse bg color
+          bg3: c.baseBackground,
+          bg2: c.headerColor,
+          bg1: c.textEditorBackground,
+        }),
     fg1: `${c.foregroundColor}e5`,
     fg2: `${c.foregroundColor}99`,
     fg3: `${c.foregroundColor}66`,
@@ -172,21 +163,6 @@ function transformThemeDef(data: ThemeDef): KoishiThemeDef {
     selectionHighlightBackground: c.identifierHighlight,
     lineHighlightBackground: `${c.baseBackground}77`,
     lineHighlightBorder: `${c.baseBackground}00`,
-
-    arrayForeground: c.constantColor,
-    constantForeground: c.constantColor,
-    enumeratorMemberForeground: c.constantColor,
-    booleanForeground: c.keywordColor,
-    classForeground: c.classNameColor,
-    enumeratorForeground: c.keyColor,
-    fieldForeground: c.keyColor,
-    constructorForeground: c.classNameColor,
-    functionForeground: editorAccent,
-    colorForeground: editorAccent,
-    eventForeground: editorAccent,
-    fileForeground: c.baseIconColor,
-    folderForeground: c.baseIconColor,
-    interfaceForeground: c.stringColor,
   };
 }
 
@@ -198,25 +174,54 @@ function generateThemeCss(theme: KoishiThemeDef): string {
   return themeTemplate
     .replace(/var\(\s*__(.+?)\s*\)/g, (_, key) => {
       const value = theme[key as keyof KoishiThemeDef];
-      if (value === undefined)
+      if (!(typeof value === "string")) {
         console.warn(`warn: Unknown key ${key} in ${theme.id}`);
-      return value ?? "/* unresolved */";
+        return "/* unresolved */";
+      }
+      return value;
     })
     .replace(/.*:\s*\/\* unresolved \*\/\s*;/g, "");
 }
 
 function generateIndexCss(themes: KoishiThemeDef[]): string {
-  return themes.map(({ id }) => `@import './themes/${id}.scss';`).join("\n");
+  const x = themes.map(({ id }) => `@import './themes/${id}.scss';`).join("\n");
+  return `${x}\n`;
 }
 
-function generateIndexTs(themes: KoishiThemeDef[]): string {
+function generateThemeTs(themes: KoishiThemeDef[]): string {
   return `import { Context } from "@koishijs/client";
 
-  import "./index.scss";
+import "./index.scss";
 
-  export default function _(ctx: Context) {
-    ${themes.map((x) => `ctx.theme({ id: "${x.id}", name: "${x.name}" });`).join("\n")}
-  }
+export type AssetInfo = { name: string, anchor: "left" | "center" | "right" };
+export type AssetsInfo = { path: string, default: AssetInfo; secondary?: AssetInfo };
+
+export const assetNameMap: Record<string, AssetsInfo> = ${JSON.stringify(
+    Object.fromEntries(
+      themes.map((x) => [
+        x.id,
+        {
+          path: /definitions\/(?<path>.*)\/(.*)\.definition\.json/.exec(
+            x.$original.$url
+          ).groups?.path as string,
+          ...Object.fromEntries(
+            Object.entries(x.$original.stickers).map(([k, v]) => [
+              k,
+              pick(v, ["name", "anchor"]),
+            ])
+          ),
+        },
+      ])
+    ),
+    null,
+    2
+  )};
+
+export function applyTheme(ctx: Context) {
+${themes
+  .map((x) => `  ctx.theme({ id: "${x.id}", name: "${x.name}" });`)
+  .join("\n")}
+}
 `;
 }
 
@@ -234,16 +239,13 @@ function generateIndexTs(themes: KoishiThemeDef[]): string {
   const tasks = [
     ...koishiDefs.map((def) =>
       Promise.resolve(generateThemeCss(def)).then((css) =>
-        write(join(themeCssDir, `${def.id}.scss`), css),
-      ),
+        write(join(themeCssDir, `${def.id}.scss`), css)
+      )
     ),
     write(indexCssPath, generateIndexCss(koishiDefs)),
-    write(indexTsPath, generateIndexTs(koishiDefs)),
+    write(themeTsPath, generateThemeTs(koishiDefs)),
   ];
   await Promise.all(tasks);
-
-  console.log("Prettifying workspace");
-  await execAsync(`prettier -cw ${rootDir}`);
 
   console.log("Done!");
 })();

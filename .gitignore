@@ -17,5 +17,6 @@ tsconfig.tsbuildinfo
 *.njsproj
 *.sln
 
-/client/*
-!/client/tsconfig.json
+/client/themes
+/client/index.scss
+/client/theme.ts

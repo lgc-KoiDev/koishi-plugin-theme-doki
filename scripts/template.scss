@@ -8,11 +8,9 @@
       --k-color-#{$name}-fade: #{fade-out($base, 0.9)};
     }
 
-    --bg0: var(__bg0);
     --bg1: var(__bg1);
     --bg2: var(__bg2);
     --bg3: var(__bg3);
-    --fg0: var(__fg0);
     --fg1: var(__fg1);
     --fg2: var(__fg2);
     --fg3: var(__fg3);
@@ -44,23 +42,6 @@
       );
       --vscode-editor-lineHighlightBackground: var(__lineHighlightBackground);
       --vscode-editor-lineHighlightBorder: var(__lineHighlightBorder);
-
-      --vscode-symbolIcon-arrayForeground: var(__arrayForeground);
-      --vscode-symbolIcon-constantForeground: var(__constantForeground);
-      --vscode-symbolIcon-enumeratorMemberForeground: var(
-        __enumeratorMemberForeground
-      );
-      --vscode-symbolIcon-booleanForeground: var(__booleanForeground);
-      --vscode-symbolIcon-classForeground: var(__classForeground);
-      --vscode-symbolIcon-enumeratorForeground: var(__enumeratorForeground);
-      --vscode-symbolIcon-fieldForeground: var(__fieldForeground);
-      --vscode-symbolIcon-constructorForeground: var(__constructorForeground);
-      --vscode-symbolIcon-functionForeground: var(__functionForeground);
-      --vscode-symbolIcon-colorForeground: var(__colorForeground);
-      --vscode-symbolIcon-eventForeground: var(__eventForeground);
-      --vscode-symbolIcon-fileForeground: var(__fileForeground);
-      --vscode-symbolIcon-folderForeground: var(__folderForeground);
-      --vscode-symbolIcon-interfaceForeground: var(__interfaceForeground);
     }
   }
 }
