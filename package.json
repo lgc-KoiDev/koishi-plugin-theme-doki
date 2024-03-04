@@ -12,15 +12,19 @@
     "lib",
     "dist"
   ],
+  "author": "student_2333 <lgc2333@126.com>",
   "license": "MIT",
   "keywords": [
     "chatbot",
     "koishi",
-    "plugin"
+    "plugin",
+    "doki",
+    "theme"
   ],
+  "homepage": "https://github.com/lgc2333/koishi-plugin-theme-doki",
   "koishi": {
     "description": {
-      "zh": "把你喜欢的二次元老婆主题应用到 Koishi 上！"
+      "zh": "在 Koishi 控制台里使用可爱的二次元角色主题吧！"
     },
     "services": {
       "required": [
