@@ -172,8 +172,10 @@ export default function apply(ctx: Context) {
       }
 
       const { useWallpaper, useSticker } = config.value.dokiTheme;
-      if (!store.wallpaper && useWallpaper) setWallpaper(assetsInfo);
-      else unsetWallpaper();
+      if (!store.wallpaper) {
+        if (useWallpaper) setWallpaper(assetsInfo);
+        else unsetWallpaper();
+      }
       if (useSticker) setSticker(assetsInfo);
       else unsetSticker();
     });
