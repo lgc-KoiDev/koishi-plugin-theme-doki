@@ -163,18 +163,16 @@ export default function apply(ctx: Context) {
     };
 
     watchEffect(() => {
-      if (store.wallpaper) return;
-
       const themeUsing = config.value.theme[colorMode.value];
       const assetsInfo = assetNameMap[themeUsing];
       if (!assetsInfo) {
-        unsetWallpaper();
+        if (!store.wallpaper) unsetWallpaper();
         unsetSticker();
         return;
       }
 
       const { useWallpaper, useSticker } = config.value.dokiTheme;
-      if (useWallpaper) setWallpaper(assetsInfo);
+      if (!store.wallpaper && useWallpaper) setWallpaper(assetsInfo);
       else unsetWallpaper();
       if (useSticker) setSticker(assetsInfo);
       else unsetSticker();
