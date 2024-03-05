@@ -1,33 +1,38 @@
-import fs from "fs";
-import { writeFile } from "fs/promises";
-import { join } from "path";
+import fs from 'fs';
+import { writeFile } from 'fs/promises';
+import { join } from 'path';
 
-import { pick } from "cosmokit";
-import { Octokit } from "octokit";
-import { Semaphore } from "semaphore-promise";
+import { pick } from 'cosmokit';
+import { Octokit } from 'octokit';
+import * as prettier from 'prettier';
+import { Semaphore } from 'semaphore-promise';
 
 const ghAuth = process.env.GITHUB_TOKEN;
 if (ghAuth) console.log(`using token, length: ${ghAuth.length}`);
 const gh = new Octokit({ auth: ghAuth });
 
-const rootDir = join(__dirname, "..");
-const indexCssDir = join(rootDir, "client");
-const themeCssDir = join(rootDir, "client", "themes");
+const rootDir = join(__dirname, '..');
+const indexCssDir = join(rootDir, 'client');
+const themeCssDir = join(rootDir, 'client', 'themes');
 
-const indexCssPath = join(indexCssDir, "index.scss");
-const themeTsPath = join(indexCssDir, "theme.ts");
+const indexCssPath = join(indexCssDir, 'index.scss');
+const themeTsPath = join(indexCssDir, 'theme.ts');
 
 if (!fs.existsSync(indexCssDir)) fs.mkdirSync(indexCssDir, { recursive: true });
 if (fs.existsSync(themeCssDir)) fs.rmSync(themeCssDir, { recursive: true });
 fs.mkdirSync(themeCssDir, { recursive: true });
 
-const themeTemplate = fs.readFileSync(join(__dirname, "template.scss"), {
-  encoding: "utf-8",
+const themeCssTemplate = fs.readFileSync(
+  join(__dirname, 'theme.scss.template'),
+  { encoding: 'utf-8' },
+);
+const themeTsTemplate = fs.readFileSync(join(__dirname, 'theme.ts.template'), {
+  encoding: 'utf-8',
 });
 
 interface StickerInfo {
   name: string;
-  anchor: "left" | "center" | "right";
+  anchor: 'left' | 'center' | 'right';
 }
 
 interface ThemeDef {
@@ -56,18 +61,18 @@ interface ThemeDef {
 async function getThemeDefs(): Promise<ThemeDef[]> {
   const urls = await gh.rest.git
     .getTree({
-      owner: "doki-theme",
-      repo: "doki-master-theme",
-      tree_sha: "master",
-      recursive: "1",
+      owner: 'doki-theme',
+      repo: 'doki-master-theme',
+      tree_sha: 'master',
+      recursive: '1',
     })
     .then(({ data }) =>
       data.tree
         .filter((x) => /^definitions.*\.json/.test(x.path))
         .map(
           (x) =>
-            `https://raw.githubusercontent.com/doki-theme/doki-master-theme/master/${x.path}`
-        )
+            `https://raw.githubusercontent.com/doki-theme/doki-master-theme/master/${x.path}`,
+        ),
     );
 
   console.log(`Found ${urls.length} theme definitions`);
@@ -82,9 +87,9 @@ async function getThemeDefs(): Promise<ThemeDef[]> {
             console.error(`Failed to fetch ${url}`);
             throw e;
           })
-          .finally(release)
-      )
-    )
+          .finally(release),
+      ),
+    ),
   );
 }
 
@@ -122,10 +127,10 @@ interface KoishiThemeDef {
 function transformThemeDef(data: ThemeDef): KoishiThemeDef {
   const c = data.colors;
 
-  const idBase = data.name.toLowerCase().replace(/[^a-zA-Z0-9]/g, "-");
-  const noSfx = idBase.endsWith("dark") || idBase.endsWith("light");
-  const sfx = `-${data.dark ? "dark" : "light"}`;
-  const id = `doki-${idBase}${noSfx ? "" : sfx}`;
+  const idBase = data.name.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-');
+  const noSfx = idBase.endsWith('dark') || idBase.endsWith('light');
+  const sfx = `-${data.dark ? 'dark' : 'light'}`;
+  const id = `doki-${idBase}${noSfx ? '' : sfx}`;
 
   return {
     $original: data,
@@ -167,62 +172,54 @@ function transformThemeDef(data: ThemeDef): KoishiThemeDef {
 }
 
 function write(path: string, data: string) {
-  return writeFile(path, data, { encoding: "utf-8" });
+  return writeFile(path, data, { encoding: 'utf-8' });
 }
 
-function generateThemeCss(theme: KoishiThemeDef): string {
-  return themeTemplate
+function generateThemeCss(theme: KoishiThemeDef): Promise<string> {
+  const codeTxt = themeCssTemplate
     .replace(/var\(\s*__(.+?)\s*\)/g, (_, key) => {
       const value = theme[key as keyof KoishiThemeDef];
-      if (!(typeof value === "string")) {
+      if (!(typeof value === 'string')) {
         console.warn(`warn: Unknown key ${key} in ${theme.id}`);
-        return "/* unresolved */";
+        return '/* unresolved */';
       }
       return value;
     })
-    .replace(/.*:\s*\/\* unresolved \*\/\s*;/g, "");
+    .replace(/.*:\s*\/\* unresolved \*\/\s*;/g, '');
+  return prettier.format(codeTxt, { parser: 'scss', singleQuote: true });
 }
 
 function generateIndexCss(themes: KoishiThemeDef[]): string {
-  const x = themes.map(({ id }) => `@import './themes/${id}.scss';`).join("\n");
+  const x = themes.map(({ id }) => `@import './themes/${id}.scss';`).join('\n');
   return `${x}\n`;
 }
 
-function generateThemeTs(themes: KoishiThemeDef[]): string {
-  return `import { Context } from "@koishijs/client";
-
-import "./index.scss";
-
-export type AssetInfo = { name: string, anchor: "left" | "center" | "right" };
-export type AssetsInfo = { path: string, default: AssetInfo; secondary?: AssetInfo };
-
-export const assetNameMap: Record<string, AssetsInfo> = ${JSON.stringify(
+function generateThemeTs(themes: KoishiThemeDef[]): Promise<string> {
+  const assetNameMapCode = JSON.stringify(
     Object.fromEntries(
       themes.map((x) => [
         x.id,
         {
           path: /definitions\/(?<path>.*)\/(.*)\.definition\.json/.exec(
-            x.$original.$url
+            x.$original.$url,
           ).groups?.path as string,
           ...Object.fromEntries(
             Object.entries(x.$original.stickers).map(([k, v]) => [
               k,
-              pick(v, ["name", "anchor"]),
-            ])
+              pick(v, ['name', 'anchor']),
+            ]),
           ),
         },
-      ])
+      ]),
     ),
-    null,
-    2
-  )};
-
-export function applyTheme(ctx: Context) {
-${themes
-  .map((x) => `  ctx.theme({ id: "${x.id}", name: "${x.name}" });`)
-  .join("\n")}
-}
-`;
+  );
+  const applyThemeCode = themes
+    .map((x) => `  ctx.theme({\n id: "${x.id}", name: "${x.name}" \n});`)
+    .join('\n');
+  const codeTxt = themeTsTemplate
+    .replace('/* nameMap */', assetNameMapCode)
+    .replace('/* themes */', applyThemeCode);
+  return prettier.format(codeTxt, { parser: 'typescript', singleQuote: true });
 }
 
 (async () => {
@@ -231,21 +228,21 @@ ${themes
     console.log(`GitHub logged in as ${data.login}`);
   }
 
-  console.log("Fetching theme definitions");
+  console.log('Fetching theme definitions');
   const defs = await getThemeDefs();
 
-  console.log("Generating koishi themes");
+  console.log('Generating koishi themes');
   const koishiDefs = defs.map(transformThemeDef);
   const tasks = [
     ...koishiDefs.map((def) =>
-      Promise.resolve(generateThemeCss(def)).then((css) =>
-        write(join(themeCssDir, `${def.id}.scss`), css)
-      )
+      generateThemeCss(def).then((css) =>
+        write(join(themeCssDir, `${def.id}.scss`), css),
+      ),
     ),
     write(indexCssPath, generateIndexCss(koishiDefs)),
-    write(themeTsPath, generateThemeTs(koishiDefs)),
+    generateThemeTs(koishiDefs).then((code) => write(themeTsPath, code)),
   ];
   await Promise.all(tasks);
 
-  console.log("Done!");
+  console.log('Done!');
 })();

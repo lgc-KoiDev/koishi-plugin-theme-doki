@@ -1,6 +1,6 @@
 :root,
 .theme-root {
-  &[theme="var(__id)"] {
+  &[theme='var(__id)'] {
     @mixin apply-color($name, $base) {
       --k-color-#{$name}: #{$base};
       --k-color-#{$name}-shade: #{mix($base, #000, 80%)};

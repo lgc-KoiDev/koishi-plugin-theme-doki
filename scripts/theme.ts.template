@@ -1,0 +1,20 @@
+import { Context } from '@koishijs/client';
+
+import './index.scss';
+
+export interface AssetInfo {
+  name: string;
+  anchor: 'left' | 'center' | 'right';
+}
+
+export interface AssetsInfo {
+  path: string;
+  default: AssetInfo;
+  secondary?: AssetInfo;
+}
+
+export const assetNameMap: Record<string, AssetsInfo> = /* nameMap */;
+
+export function applyTheme(ctx: Context) {
+  /* themes */
+}
