@@ -73,6 +73,11 @@ Telegram：[@lgc2333](https://t.me/lgc2333)
 
 ## 📝 更新日志
 
+### 0.2.0
+
+- 将 Doki Theme 的设置移进了外观设置中
+- 可以设置资源文件的 URL 前缀了
+
 ### 0.1.1 & 0.1.2
 
 - 修复了与 `koishi-plugin-wallpaper` 的兼容性，如遇问题刷新页面即可

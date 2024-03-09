@@ -7,6 +7,8 @@ import { computed, watchEffect } from 'vue';
 import { AssetsInfo, applyTheme, assetNameMap } from './theme';
 
 export interface DokiThemeConfig {
+  resBaseURL: string;
+
   useWallpaper: boolean;
   useSecondaryWallpaper: boolean;
   wallpaperOpacity: number;
@@ -18,13 +20,23 @@ export interface DokiThemeConfig {
   stickerYOffset: number;
 }
 
+const DEFAULT_BASE_URL =
+  'https://raw.gitmirror.com/doki-theme/doki-theme-assets/master/';
+
 export const DokiThemeConfig: Schema<DokiThemeConfig> = Schema.intersect([
   Schema.intersect([
+    Schema.object({
+      resBaseURL: Schema.string()
+        .role('link')
+        .default(DEFAULT_BASE_URL)
+        .description('图片资源的 URL 前缀。'),
+    }).description('Doki Theme: 通用设置'),
+
     Schema.object({
       useWallpaper: Schema.boolean()
         .default(true)
         .description('使用背景图片，在 `koishi-plugin-wallpaper` 启用时无效。'),
-    }).description('背景设置'),
+    }).description('Doki Theme: 背景设置'),
     Schema.union([
       Schema.object({
         useWallpaper: Schema.const(true),
@@ -46,7 +58,7 @@ export const DokiThemeConfig: Schema<DokiThemeConfig> = Schema.intersect([
   Schema.intersect([
     Schema.object({
       useSticker: Schema.boolean().default(true).description('使用贴纸。'),
-    }).description('贴纸设置'),
+    }).description('Doki Theme: 贴纸设置'),
     Schema.union([
       Schema.object({
         useSticker: Schema.const(true),
@@ -78,17 +90,8 @@ declare module '@koishijs/client' {
   }
 }
 
-const resBaseUrl =
-  'https://raw.githubusercontent.com/doki-theme/doki-theme-assets/master';
-
 export default function apply(ctx: Context) {
   applyTheme(ctx);
-
-  ctx.settings({
-    id: 'dokiTheme',
-    title: 'Doki Theme',
-    schema: Schema.object({ dokiTheme: DokiThemeConfig }),
-  });
 
   ctx.on('ready', () => {
     const config = useConfig();
@@ -103,6 +106,11 @@ export default function apply(ctx: Context) {
 
     const stickerElemId = 'doki-theme-sticker';
     const body = window.document.querySelector('body');
+
+    const getResURL = (suffix: string) => {
+      const base = config.value.dokiTheme.resBaseURL;
+      return new URL(suffix, base.endsWith('/') ? base : `${base}/`).href;
+    };
 
     const getStickerElem = async (): Promise<HTMLDivElement> => {
       const found = document.getElementById(stickerElemId);
@@ -129,7 +137,7 @@ export default function apply(ctx: Context) {
         dokiConf.useSecondaryWallpaper && info.secondary
           ? info.secondary
           : info.default;
-      body.style.backgroundImage = `url('${resBaseUrl}/backgrounds/${name}')`;
+      body.style.backgroundImage = `url('${getResURL(`backgrounds/${name}`)}')`;
       body.style.backgroundPosition = `${anchor} bottom`;
       body.style.backgroundSize = 'cover';
       body.style.opacity = `${dokiConf.wallpaperOpacity}`;
@@ -152,7 +160,7 @@ export default function apply(ctx: Context) {
           ? info.secondary
           : info.default;
 
-      elem.style.backgroundImage = `url('${resBaseUrl}/stickers/vscode/${info.path}/${name}')`;
+      elem.style.backgroundImage = `url('${getResURL(`stickers/vscode/${info.path}/${name}`)}')`;
       elem.style.opacity = `${dokiConf.stickerOpacity}`;
       elem.style.backgroundPosition = `bottom ${dokiConf.stickerYOffset} right ${dokiConf.stickerXOffset}`;
       body.appendChild(elem);
@@ -161,6 +169,12 @@ export default function apply(ctx: Context) {
     const unsetSticker = async () => {
       document.getElementById(stickerElemId)?.remove();
     };
+
+    ctx.settings({
+      id: 'appearance',
+      disabled: () => !assetNameMap[config.value.theme[colorMode.value]],
+      schema: Schema.object({ dokiTheme: DokiThemeConfig }),
+    });
 
     watchEffect(() => {
       const themeUsing = config.value.theme[colorMode.value];
