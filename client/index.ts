@@ -90,19 +90,26 @@ declare module '@koishijs/client' {
   }
 }
 
+const config = useConfig();
+
+const preferDark = usePreferredDark();
+const colorMode = computed(() => {
+  const { mode } = config.value.theme;
+  if (mode !== 'auto') return mode;
+  return preferDark.value ? 'dark' : 'light';
+});
+
 export default function apply(ctx: Context) {
   applyTheme(ctx);
 
-  ctx.on('ready', () => {
-    const config = useConfig();
-    config.value.dokiTheme ||= DokiThemeConfig();
+  ctx.settings({
+    id: 'appearance',
+    disabled: () => !assetNameMap[config.value.theme[colorMode.value]],
+    schema: Schema.object({ dokiTheme: DokiThemeConfig }),
+  });
 
-    const preferDark = usePreferredDark();
-    const colorMode = computed(() => {
-      const { mode } = config.value.theme;
-      if (mode !== 'auto') return mode;
-      return preferDark.value ? 'dark' : 'light';
-    });
+  ctx.on('ready', () => {
+    config.value.dokiTheme ||= DokiThemeConfig();
 
     const stickerElemId = 'doki-theme-sticker';
     const body = window.document.querySelector('body');
@@ -169,12 +176,6 @@ export default function apply(ctx: Context) {
     const unsetSticker = async () => {
       document.getElementById(stickerElemId)?.remove();
     };
-
-    ctx.settings({
-      id: 'appearance',
-      disabled: () => !assetNameMap[config.value.theme[colorMode.value]],
-      schema: Schema.object({ dokiTheme: DokiThemeConfig }),
-    });
 
     watchEffect(() => {
       const themeUsing = config.value.theme[colorMode.value];
