@@ -33,12 +33,12 @@
     }
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.17.0",
-    "koishi": "^4.17.1"
+    "@koishijs/plugin-console": "^5.28.0",
+    "koishi": "^4.17.2"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.17.0",
-    "@koishijs/plugin-console": "^5.17.0",
+    "@koishijs/client": "^5.28.0",
+    "@koishijs/plugin-console": "^5.28.0",
     "@vueuse/core": "^10.9.0",
     "cosmokit": "^1.5.2",
     "koishi-plugin-wallpaper": "^1.0.4",
@@ -46,7 +46,7 @@
     "prettier": "^3.2.5",
     "semaphore-promise": "^1.4.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.2",
     "vue": "^3.4.21"
   }
 }
