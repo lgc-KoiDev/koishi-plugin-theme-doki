@@ -34,19 +34,19 @@
   },
   "peerDependencies": {
     "@koishijs/plugin-console": "^5.28.2",
-    "koishi": "^4.17.3"
+    "koishi": "^4.17.4"
   },
   "devDependencies": {
     "@koishijs/client": "^5.28.2",
     "@koishijs/plugin-console": "^5.28.2",
     "@vueuse/core": "^10.9.0",
-    "cosmokit": "^1.5.2",
+    "cosmokit": "^1.6.2",
     "koishi-plugin-wallpaper": "^1.0.4",
     "octokit": "^3.2.0",
     "prettier": "^3.2.5",
     "semaphore-promise": "^1.4.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.4",
+    "typescript": "^5.4.5",
     "vue": "^3.4.21"
   }
 }
