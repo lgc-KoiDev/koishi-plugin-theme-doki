@@ -1,27 +1,27 @@
-import { Context, Schema, store, useConfig } from '@koishijs/client';
-import { usePreferredDark } from '@vueuse/core';
-import type {} from 'koishi-plugin-theme-doki';
-import type {} from 'koishi-plugin-wallpaper';
-import { computed, watchEffect } from 'vue';
+import { Context, Schema, store, useConfig } from '@koishijs/client'
+import { usePreferredDark } from '@vueuse/core'
+import type {} from 'koishi-plugin-theme-doki'
+import type {} from 'koishi-plugin-wallpaper'
+import { computed, watchEffect } from 'vue'
 
-import { AssetsInfo, applyTheme, assetNameMap } from './theme';
+import { applyTheme, assetNameMap, AssetsInfo } from './theme'
 
 export interface DokiThemeConfig {
-  resBaseURL: string;
+  resBaseURL: string
 
-  useWallpaper: boolean;
-  useSecondaryWallpaper: boolean;
-  wallpaperOpacity: number;
+  useWallpaper: boolean
+  useSecondaryWallpaper: boolean
+  wallpaperOpacity: number
 
-  useSticker: boolean;
-  useSecondarySticker: boolean;
-  stickerOpacity: number;
-  stickerXOffset: number;
-  stickerYOffset: number;
+  useSticker: boolean
+  useSecondarySticker: boolean
+  stickerOpacity: number
+  stickerXOffset: number
+  stickerYOffset: number
 }
 
 const DEFAULT_BASE_URL =
-  'https://raw.gitmirror.com/doki-theme/doki-theme-assets/master/';
+  'https://raw.gitmirror.com/doki-theme/doki-theme-assets/master/'
 
 export const DokiThemeConfig: Schema<DokiThemeConfig> = Schema.intersect([
   Schema.intersect([
@@ -82,122 +82,122 @@ export const DokiThemeConfig: Schema<DokiThemeConfig> = Schema.intersect([
       Schema.object({}),
     ]),
   ]),
-]);
+])
 
 declare module '@koishijs/client' {
   export interface Config {
-    dokiTheme?: DokiThemeConfig;
+    dokiTheme?: DokiThemeConfig
   }
 }
 
-const config = useConfig();
+const config = useConfig()
 
-const preferDark = usePreferredDark();
+const preferDark = usePreferredDark()
 const colorMode = computed(() => {
-  const { mode } = config.value.theme;
-  if (mode !== 'auto') return mode;
-  return preferDark.value ? 'dark' : 'light';
-});
+  const { mode } = config.value.theme
+  if (mode !== 'auto') return mode
+  return preferDark.value ? 'dark' : 'light'
+})
 
 export default function apply(ctx: Context) {
-  applyTheme(ctx);
+  applyTheme(ctx)
 
   ctx.settings({
     id: 'appearance',
     disabled: () => !assetNameMap[config.value.theme[colorMode.value]],
     schema: Schema.object({ dokiTheme: DokiThemeConfig }),
-  });
+  })
 
   ctx.on('ready', () => {
-    config.value.dokiTheme ||= DokiThemeConfig();
+    config.value.dokiTheme ||= DokiThemeConfig()
 
-    const stickerElemId = 'doki-theme-sticker';
-    const body = window.document.querySelector('body');
+    const stickerElemId = 'doki-theme-sticker'
+    const body = window.document.querySelector('body')
 
     const getResURL = (suffix: string) => {
-      const base = config.value.dokiTheme.resBaseURL;
-      return new URL(suffix, base.endsWith('/') ? base : `${base}/`).href;
-    };
+      const base = config.value.dokiTheme.resBaseURL
+      return new URL(suffix, base.endsWith('/') ? base : `${base}/`).href
+    }
 
     const getStickerElem = async (): Promise<HTMLDivElement> => {
-      const found = document.getElementById(stickerElemId);
-      if (found) return found as any;
+      const found = document.getElementById(stickerElemId)
+      if (found) return found as any
 
-      const elem = document.createElement('div');
-      elem.id = stickerElemId;
-      elem.style.position = 'fixed';
-      elem.style.bottom = '0';
-      elem.style.right = '0';
-      elem.style.zIndex = '100';
-      elem.style.width = '100%';
-      elem.style.height = '100%';
-      elem.style.backgroundRepeat = 'no-repeat';
-      elem.style.pointerEvents = 'none';
+      const elem = document.createElement('div')
+      elem.id = stickerElemId
+      elem.style.position = 'fixed'
+      elem.style.bottom = '0'
+      elem.style.right = '0'
+      elem.style.zIndex = '100'
+      elem.style.width = '100%'
+      elem.style.height = '100%'
+      elem.style.backgroundRepeat = 'no-repeat'
+      elem.style.pointerEvents = 'none'
 
-      body.appendChild(elem);
-      return elem;
-    };
+      body.appendChild(elem)
+      return elem
+    }
 
     const setWallpaper = async (info: AssetsInfo) => {
-      const dokiConf = config.value.dokiTheme;
+      const dokiConf = config.value.dokiTheme
       const { name, anchor } =
         dokiConf.useSecondaryWallpaper && info.secondary
           ? info.secondary
-          : info.default;
-      body.style.backgroundImage = `url('${getResURL(`backgrounds/${name}`)}')`;
-      body.style.backgroundPosition = `${anchor} bottom`;
-      body.style.backgroundSize = 'cover';
-      body.style.opacity = `${dokiConf.wallpaperOpacity}`;
-    };
+          : info.default
+      body.style.backgroundImage = `url('${getResURL(`backgrounds/${name}`)}')`
+      body.style.backgroundPosition = `${anchor} bottom`
+      body.style.backgroundSize = 'cover'
+      body.style.opacity = `${dokiConf.wallpaperOpacity}`
+    }
 
     const unsetWallpaper = async () => {
-      body.style.backgroundImage = '';
-      body.style.backgroundPosition = '';
-      body.style.backgroundSize = '';
-      body.style.opacity = '';
-    };
+      body.style.backgroundImage = ''
+      body.style.backgroundPosition = ''
+      body.style.backgroundSize = ''
+      body.style.opacity = ''
+    }
 
     const setSticker = async (info: AssetsInfo) => {
-      const elem = await getStickerElem();
-      if (!elem) return;
+      const elem = await getStickerElem()
+      if (!elem) return
 
-      const dokiConf = config.value.dokiTheme;
+      const dokiConf = config.value.dokiTheme
       const { name } =
         dokiConf.useSecondarySticker && info.secondary
           ? info.secondary
-          : info.default;
+          : info.default
 
-      elem.style.backgroundImage = `url('${getResURL(`stickers/vscode/${info.path}/${name}`)}')`;
-      elem.style.opacity = `${dokiConf.stickerOpacity}`;
-      elem.style.backgroundPosition = `bottom ${dokiConf.stickerYOffset} right ${dokiConf.stickerXOffset}`;
-      body.appendChild(elem);
-    };
+      elem.style.backgroundImage = `url('${getResURL(`stickers/vscode/${info.path}/${name}`)}')`
+      elem.style.opacity = `${dokiConf.stickerOpacity}`
+      elem.style.backgroundPosition = `bottom ${dokiConf.stickerYOffset} right ${dokiConf.stickerXOffset}`
+      body.appendChild(elem)
+    }
 
     const unsetSticker = async () => {
-      document.getElementById(stickerElemId)?.remove();
-    };
+      document.getElementById(stickerElemId)?.remove()
+    }
 
     watchEffect(() => {
-      const themeUsing = config.value.theme[colorMode.value];
-      const assetsInfo = assetNameMap[themeUsing];
+      const themeUsing = config.value.theme[colorMode.value]
+      const assetsInfo = assetNameMap[themeUsing]
       if (!assetsInfo) {
-        if (!store.wallpaper) unsetWallpaper();
-        unsetSticker();
-        return;
+        if (!store.wallpaper) unsetWallpaper()
+        unsetSticker()
+        return
       }
 
-      const { useWallpaper, useSticker } = config.value.dokiTheme;
+      const { useWallpaper, useSticker } = config.value.dokiTheme
       if (!store.wallpaper) {
-        if (useWallpaper) setWallpaper(assetsInfo);
-        else unsetWallpaper();
+        if (useWallpaper) setWallpaper(assetsInfo)
+        else unsetWallpaper()
       }
-      if (useSticker) setSticker(assetsInfo);
-      else unsetSticker();
-    });
+      if (useSticker) setSticker(assetsInfo)
+      else unsetSticker()
+    })
 
     ctx.on('dispose', () => {
-      if (!store.wallpaper) unsetWallpaper();
-      unsetSticker();
-    });
-  });
+      if (!store.wallpaper) unsetWallpaper()
+      unsetSticker()
+    })
+  })
 }
