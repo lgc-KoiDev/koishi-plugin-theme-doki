@@ -1,24 +1,45 @@
 import { Context, Schema, store, useConfig } from '@koishijs/client'
 import { usePreferredDark } from '@vueuse/core'
-import type {} from 'koishi-plugin-theme-doki'
-import type {} from 'koishi-plugin-wallpaper'
 import { computed, watchEffect } from 'vue'
 
-import { applyTheme, assetNameMap, AssetsInfo } from './theme'
+import { AssetsInfo, applyTheme, assetNameMap } from './theme'
 
-export interface DokiThemeConfig {
+import type {} from 'koishi-plugin-theme-doki'
+import type {} from 'koishi-plugin-wallpaper'
+
+export interface DokiThemeBaseConfig {
   resBaseURL: string
+}
 
+export interface DokiThemeWallpaperConfigBase {
   useWallpaper: boolean
+}
+export interface DokiThemeWallPaperConfigOpen {
+  useWallpaper: true
   useSecondaryWallpaper: boolean
   wallpaperOpacity: number
+}
+export type DokiThemeWallPaperConfig =
+  | DokiThemeWallpaperConfigBase
+  | DokiThemeWallPaperConfigOpen
 
+export interface DokiThemeStickerConfigBase {
   useSticker: boolean
+}
+export interface DokiThemeStickerConfigOpen {
+  useSticker: true
   useSecondarySticker: boolean
   stickerOpacity: number
-  stickerXOffset: number
-  stickerYOffset: number
+  stickerXOffset: string
+  stickerYOffset: string
 }
+export type DokiThemeStickerConfig =
+  | DokiThemeStickerConfigBase
+  | DokiThemeStickerConfigOpen
+
+export type DokiThemeConfig = DokiThemeBaseConfig &
+  DokiThemeWallPaperConfig &
+  DokiThemeStickerConfig
 
 const DEFAULT_BASE_URL =
   'https://raw.gitmirror.com/doki-theme/doki-theme-assets/master/'
@@ -112,10 +133,10 @@ export default function apply(ctx: Context) {
     config.value.dokiTheme ||= DokiThemeConfig()
 
     const stickerElemId = 'doki-theme-sticker'
-    const body = window.document.querySelector('body')
+    const body = window.document.querySelector('body')!
 
     const getResURL = (suffix: string) => {
-      const base = config.value.dokiTheme.resBaseURL
+      const base = config.value.dokiTheme!.resBaseURL
       return new URL(suffix, base.endsWith('/') ? base : `${base}/`).href
     }
 
@@ -139,7 +160,8 @@ export default function apply(ctx: Context) {
     }
 
     const setWallpaper = async (info: AssetsInfo) => {
-      const dokiConf = config.value.dokiTheme
+      const dokiConf = config.value.dokiTheme! as DokiThemeConfig &
+        DokiThemeWallPaperConfigOpen
       const { name, anchor } =
         dokiConf.useSecondaryWallpaper && info.secondary
           ? info.secondary
@@ -161,7 +183,8 @@ export default function apply(ctx: Context) {
       const elem = await getStickerElem()
       if (!elem) return
 
-      const dokiConf = config.value.dokiTheme
+      const dokiConf = config.value.dokiTheme as DokiThemeConfig &
+        DokiThemeStickerConfigOpen
       const { name } =
         dokiConf.useSecondarySticker && info.secondary
           ? info.secondary
@@ -186,7 +209,7 @@ export default function apply(ctx: Context) {
         return
       }
 
-      const { useWallpaper, useSticker } = config.value.dokiTheme
+      const { useWallpaper, useSticker } = config.value.dokiTheme!
       if (!store.wallpaper) {
         if (useWallpaper) setWallpaper(assetsInfo)
         else unsetWallpaper()

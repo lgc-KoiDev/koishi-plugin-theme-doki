@@ -1,6 +1,8 @@
-import { Context, z } from 'koishi'
-import {} from '@koishijs/plugin-console'
 import { resolve } from 'path'
+
+import { Context, z } from 'koishi'
+
+import type {} from '@koishijs/plugin-console'
 
 export const name = 'theme-doki'
 export const using = ['console']
