@@ -24,10 +24,9 @@ if (!fs.existsSync(indexCssDir)) fs.mkdirSync(indexCssDir, { recursive: true })
 if (fs.existsSync(themeCssDir)) fs.rmSync(themeCssDir, { recursive: true })
 fs.mkdirSync(themeCssDir, { recursive: true })
 
-const themeCssTemplate = fs.readFileSync(
-  join(__dirname, 'theme.scss.template'),
-  { encoding: 'utf-8' },
-)
+const themeCssTemplate = fs.readFileSync(join(__dirname, 'theme.scss.template'), {
+  encoding: 'utf-8',
+})
 const themeTsTemplate = fs.readFileSync(join(__dirname, 'theme.ts.template'), {
   encoding: 'utf-8',
 })

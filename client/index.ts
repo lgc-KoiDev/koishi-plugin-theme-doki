@@ -163,9 +163,7 @@ export default function apply(ctx: Context) {
       const dokiConf = config.value.dokiTheme! as DokiThemeConfig &
         DokiThemeWallPaperConfigOpen
       const { name, anchor } =
-        dokiConf.useSecondaryWallpaper && info.secondary
-          ? info.secondary
-          : info.default
+        dokiConf.useSecondaryWallpaper && info.secondary ? info.secondary : info.default
       body.style.backgroundImage = `url('${getResURL(`backgrounds/${name}`)}')`
       body.style.backgroundPosition = `${anchor} bottom`
       body.style.backgroundSize = 'cover'
@@ -186,9 +184,7 @@ export default function apply(ctx: Context) {
       const dokiConf = config.value.dokiTheme as DokiThemeConfig &
         DokiThemeStickerConfigOpen
       const { name } =
-        dokiConf.useSecondarySticker && info.secondary
-          ? info.secondary
-          : info.default
+        dokiConf.useSecondarySticker && info.secondary ? info.secondary : info.default
 
       elem.style.backgroundImage = `url('${getResURL(`stickers/vscode/${info.path}/${name}`)}')`
       elem.style.opacity = `${dokiConf.stickerOpacity}`
