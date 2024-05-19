@@ -29,7 +29,7 @@
     "doki",
     "theme"
   ],
-  "homepage": "https://github.com/lgc2333/koishi-plugin-theme-doki",
+  "homepage": "https://github.com/lgc-KoiDev/koishi-plugin-theme-doki",
   "koishi": {
     "description": {
       "zh": "在 Koishi 控制台里使用可爱的二次元角色主题吧！"

@@ -3,11 +3,11 @@
 <div align="center">
 
 <a href="https://koishi.chat/zh-CN/market/">
-  <img src="https://raw.githubusercontent.com/lgc2333/koishi-workspace/master/readme/koishi-plugin.png" width="180" height="180" alt="NoneBotPluginLogo">
+  <img src="https://raw.githubusercontent.com/lgc-KoiDev/readme/master/workspace/koishi-plugin.png" width="180" height="180" alt="NoneBotPluginLogo">
 </a>
 
 <p>
-  <img src="https://raw.githubusercontent.com/lgc2333/koishi-workspace/master/readme/KoishiPlugin.svg" width="240" alt="NoneBotPluginText">
+  <img src="https://raw.githubusercontent.com/lgc-KoiDev/readme/master/workspace/KoishiPlugin.svg" width="240" alt="NoneBotPluginText">
 </p>
 
 # Koishi-Plugin-Theme-Doki
@@ -15,7 +15,7 @@
 _✨ 在 Koishi 控制台里使用可爱的二次元角色主题吧！ ✨_
 
 <a href="./LICENSE">
-  <img src="https://img.shields.io/github/license/lgc2333/koishi-plugin-theme-doki.svg" alt="license">
+  <img src="https://img.shields.io/github/license/lgc-KoiDev/koishi-plugin-theme-doki.svg" alt="license">
 </a>
 <a href="https://www.npmjs.com/package/koishi-plugin-theme-doki">
   <img src="https://img.shields.io/npm/v/koishi-plugin-theme-doki" alt="pypi">
@@ -33,10 +33,10 @@ _✨ 在 Koishi 控制台里使用可爱的二次元角色主题吧！ ✨_
 
 <center>
 
-![sample1](https://raw.githubusercontent.com/lgc2333/koishi-workspace/master/readme/theme-doki/sample1.png)  
+![sample1](https://raw.githubusercontent.com/lgc-KoiDev/readme/master/workspace/theme-doki/sample1.png)  
 使用主题：`NekoPara: Vanilla`
 
-![sample2](https://raw.githubusercontent.com/lgc2333/koishi-workspace/master/readme/theme-doki/sample2.png)  
+![sample2](https://raw.githubusercontent.com/lgc-KoiDev/readme/master/workspace/theme-doki/sample2.png)  
 使用主题：`NekoPara: Shigure`
 
 </center>
