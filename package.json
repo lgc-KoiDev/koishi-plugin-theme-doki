@@ -45,20 +45,20 @@
     "browser": true
   },
   "peerDependencies": {
-    "@koishijs/plugin-console": "^5.28.4",
-    "koishi": "^4.17.6"
+    "@koishijs/plugin-console": "^5.29.2",
+    "koishi": "^4.17.9"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.28.4",
-    "@koishijs/plugin-console": "^5.28.4",
-    "@vueuse/core": "^10.9.0",
+    "@koishijs/client": "^5.29.2",
+    "@koishijs/plugin-console": "^5.29.2",
+    "@vueuse/core": "^10.11.0",
     "cosmokit": "^1.6.2",
-    "koishi-plugin-wallpaper": "^1.0.4",
+    "koishi-plugin-wallpaper": "^1.0.5",
     "octokit": "^3.2.1",
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.2",
     "semaphore-promise": "^1.4.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5",
-    "vue": "^3.4.27"
+    "typescript": "^5.5.2",
+    "vue": "^3.4.29"
   }
 }
