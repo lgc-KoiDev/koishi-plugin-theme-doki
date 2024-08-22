@@ -6,7 +6,6 @@ import { join } from 'path'
 
 import { pick } from 'cosmokit'
 import { Octokit } from 'octokit'
-import * as prettier from 'prettier'
 import { Semaphore } from 'semaphore-promise'
 
 const ghAuth = process.env.GITHUB_TOKEN
@@ -176,7 +175,7 @@ function write(path: string, data: string) {
   return writeFile(path, data, { encoding: 'utf-8' })
 }
 
-function generateThemeCss(theme: KoishiThemeDef): Promise<string> {
+function generateThemeCss(theme: KoishiThemeDef): string {
   const codeTxt = themeCssTemplate
     .replace(/var\(\s*__(.+?)\s*\)/g, (_, key) => {
       const value = theme[key as keyof KoishiThemeDef]
@@ -187,7 +186,7 @@ function generateThemeCss(theme: KoishiThemeDef): Promise<string> {
       return value
     })
     .replace(/.*:\s*\/\* unresolved \*\/\s*;/g, '')
-  return prettier.format(codeTxt, { parser: 'scss', singleQuote: true })
+  return codeTxt
 }
 
 function generateIndexCss(themes: KoishiThemeDef[]): string {
@@ -195,7 +194,7 @@ function generateIndexCss(themes: KoishiThemeDef[]): string {
   return `${x}\n`
 }
 
-function generateThemeTs(themes: KoishiThemeDef[]): Promise<string> {
+function generateThemeTs(themes: KoishiThemeDef[]): string {
   const assetNameMapCode = JSON.stringify(
     Object.fromEntries(
       themes.map((x) => [
@@ -213,14 +212,16 @@ function generateThemeTs(themes: KoishiThemeDef[]): Promise<string> {
         },
       ]),
     ),
+    null,
+    2,
   )
   const applyThemeCode = themes
-    .map((x) => `  ctx.theme({\n id: "${x.id}", name: "${x.name}" \n});`)
+    .map((x) => `  ctx.theme({\n    id: '${x.id}',\n    name: '${x.name}'\n  })`)
     .join('\n')
   const codeTxt = themeTsTemplate
     .replace('/* nameMap */', assetNameMapCode)
     .replace('/* themes */', applyThemeCode)
-  return prettier.format(codeTxt, { parser: 'typescript', singleQuote: true })
+  return codeTxt
 }
 
 ;(async () => {
@@ -236,12 +237,10 @@ function generateThemeTs(themes: KoishiThemeDef[]): Promise<string> {
   const koishiDefs = defs.map(transformThemeDef)
   const tasks = [
     ...koishiDefs.map((def) =>
-      generateThemeCss(def).then((css) =>
-        write(join(themeCssDir, `${def.id}.scss`), css),
-      ),
+      write(join(themeCssDir, `${def.id}.scss`), generateThemeCss(def)),
     ),
     write(indexCssPath, generateIndexCss(koishiDefs)),
-    generateThemeTs(koishiDefs).then((code) => write(themeTsPath, code)),
+    write(themeTsPath, generateThemeTs(koishiDefs)),
   ]
   await Promise.all(tasks)
 

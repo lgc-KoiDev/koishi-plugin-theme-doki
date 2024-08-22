@@ -1,19 +1,19 @@
-import { Context } from '@koishijs/client';
+import { Context } from '@koishijs/client'
 
-import './index.scss';
+import './index.scss'
 
 export interface AssetInfo {
-  name: string;
-  anchor: 'left' | 'center' | 'right';
+  name: string
+  anchor: 'left' | 'center' | 'right'
 }
 
 export interface AssetsInfo {
-  path: string;
-  default: AssetInfo;
-  secondary?: AssetInfo;
+  path: string
+  default: AssetInfo
+  secondary?: AssetInfo
 }
 
-export const assetNameMap: Record<string, AssetsInfo> = /* nameMap */;
+export const assetNameMap: Record<string, AssetsInfo> = /* nameMap */
 
 export function applyTheme(ctx: Context) {
   /* themes */

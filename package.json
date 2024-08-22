@@ -14,7 +14,8 @@
   },
   "scripts": {
     "build": "tsc -b && koishi-console build",
-    "generate": "ts-node ./scripts/generate-theme.ts"
+    "format": "prettier --config ../../.prettierrc.yml --ignore-path .prettierignore -cw .",
+    "generate": "ts-node ./scripts/generate-theme.ts && yarn format"
   },
   "files": [
     "lib",
