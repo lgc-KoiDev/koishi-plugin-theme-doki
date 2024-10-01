@@ -216,7 +216,13 @@ function generateThemeTs(themes: KoishiThemeDef[]): string {
     2,
   )
   const applyThemeCode = themes
-    .map((x) => `  ctx.theme({\n    id: '${x.id}',\n    name: '${x.name}'\n  })`)
+    .map(
+      (x) =>
+        `  ctx.theme({\n` +
+        `    id: '${x.id}',\n` +
+        `    name: '${x.name.replaceAll("'", "\\'")}'\n` +
+        `  })`,
+    )
     .join('\n')
   const codeTxt = themeTsTemplate
     .replace('/* nameMap */', assetNameMapCode)

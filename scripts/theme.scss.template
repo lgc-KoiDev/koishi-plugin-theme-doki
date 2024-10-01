@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 :root,
 .theme-root {
   &[theme='var(__id)'] {
@@ -5,7 +7,7 @@
       --k-color-#{$name}: #{$base};
       --k-color-#{$name}-shade: #{mix($base, #000, 80%)};
       --k-color-#{$name}-tint: #{mix($base, #fff, 90%)};
-      --k-color-#{$name}-fade: #{fade-out($base, 0.9)};
+      --k-color-#{$name}-fade: #{color.adjust($base, $alpha: -0.9)};
     }
 
     --bg1: var(__bg1);
@@ -34,12 +36,8 @@
 
       --vscode-editor-selectionBackground: var(__selectionBackground);
       --vscode-editor-selectionForeground: var(__selectionForeground);
-      --vscode-editor-inactiveSelectionBackground: var(
-        __inactiveSelectionBackground
-      );
-      --vscode-editor-selectionHighlightBackground: var(
-        __selectionHighlightBackground
-      );
+      --vscode-editor-inactiveSelectionBackground: var(__inactiveSelectionBackground);
+      --vscode-editor-selectionHighlightBackground: var(__selectionHighlightBackground);
       --vscode-editor-lineHighlightBackground: var(__lineHighlightBackground);
       --vscode-editor-lineHighlightBorder: var(__lineHighlightBorder);
     }
