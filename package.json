@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-theme-doki",
   "description": "Doki Theme for Koishi Console",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "main": "lib/index.cjs",
   "typings": "lib/index.d.ts",
   "exports": {
@@ -13,7 +13,6 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsc -b && koishi-console build",
     "format": "prettier --config ../../.prettierrc.yml --ignore-path .prettierignore -cw .",
     "generate": "ts-node ./scripts/generate-theme.ts && yarn format"
   },

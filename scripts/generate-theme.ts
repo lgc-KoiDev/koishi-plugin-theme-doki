@@ -190,7 +190,7 @@ function generateThemeCss(theme: KoishiThemeDef): string {
 }
 
 function generateIndexCss(themes: KoishiThemeDef[]): string {
-  const x = themes.map(({ id }) => `@import './themes/${id}.scss';`).join('\n')
+  const x = themes.map(({ id }) => `@use './themes/${id}.scss';`).join('\n')
   return `${x}\n`
 }
 

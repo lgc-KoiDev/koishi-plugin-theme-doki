@@ -5,8 +5,8 @@
   &[theme='var(__id)'] {
     @mixin apply-color($name, $base) {
       --k-color-#{$name}: #{$base};
-      --k-color-#{$name}-shade: #{mix($base, #000, 80%)};
-      --k-color-#{$name}-tint: #{mix($base, #fff, 90%)};
+      --k-color-#{$name}-shade: #{color.mix($base, #000, 80%)};
+      --k-color-#{$name}-tint: #{color.mix($base, #fff, 90%)};
       --k-color-#{$name}-fade: #{color.adjust($base, $alpha: -0.9)};
     }
 
