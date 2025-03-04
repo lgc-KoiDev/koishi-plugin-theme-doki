@@ -14,7 +14,7 @@
   },
   "scripts": {
     "format": "prettier --config ../../.prettierrc.yml --ignore-path .prettierignore -cw .",
-    "generate": "ts-node ./scripts/generate-theme.ts && yarn format"
+    "generate": "tsx ./scripts/generate-theme.mts && yarn format"
   },
   "files": [
     "lib",
@@ -57,7 +57,7 @@
     "octokit": "^4.1.2",
     "prettier": "^3.5.2",
     "semaphore-promise": "^1.4.2",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.2",
     "vue": "^3.5.13"
   }

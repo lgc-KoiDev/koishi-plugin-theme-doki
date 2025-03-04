@@ -12,7 +12,7 @@ const ghAuth = process.env.GITHUB_TOKEN
 if (ghAuth) console.log(`using token, length: ${ghAuth.length}`)
 const gh = new Octokit({ auth: ghAuth })
 
-const rootDir = join(__dirname, '..')
+const rootDir = join(import.meta.dirname, '..')
 const indexCssDir = join(rootDir, 'client')
 const themeCssDir = join(rootDir, 'client', 'themes')
 
@@ -23,12 +23,14 @@ if (!fs.existsSync(indexCssDir)) fs.mkdirSync(indexCssDir, { recursive: true })
 if (fs.existsSync(themeCssDir)) fs.rmSync(themeCssDir, { recursive: true })
 fs.mkdirSync(themeCssDir, { recursive: true })
 
-const themeCssTemplate = fs.readFileSync(join(__dirname, 'theme.scss.template'), {
-  encoding: 'utf-8',
-})
-const themeTsTemplate = fs.readFileSync(join(__dirname, 'theme.ts.template'), {
-  encoding: 'utf-8',
-})
+const themeCssTemplate = fs.readFileSync(
+  join(import.meta.dirname, 'theme.scss.template'),
+  { encoding: 'utf-8' },
+)
+const themeTsTemplate = fs.readFileSync(
+  join(import.meta.dirname, 'theme.ts.template'),
+  { encoding: 'utf-8' },
+)
 
 interface StickerInfo {
   name: string
