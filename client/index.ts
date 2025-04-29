@@ -1,11 +1,10 @@
 import { Context, Schema, store, useConfig } from '@koishijs/client'
 import { usePreferredDark } from '@vueuse/core'
+import type {} from 'koishi-plugin-theme-doki'
+import type {} from 'koishi-plugin-wallpaper'
 import { computed, watchEffect } from 'vue'
 
 import { AssetsInfo, applyTheme, assetNameMap } from './theme'
-
-import type {} from 'koishi-plugin-theme-doki'
-import type {} from 'koishi-plugin-wallpaper'
 
 export interface DokiThemeBaseConfig {
   resBaseURL: string

@@ -1,8 +1,7 @@
 /* eslint-disable no-console */
-
-import fs from 'fs'
-import { writeFile } from 'fs/promises'
-import { join } from 'path'
+import fs from 'node:fs'
+import { writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 
 import { pick } from 'cosmokit'
 import { Octokit } from 'octokit'
