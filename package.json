@@ -49,16 +49,16 @@
     "koishi": "^4.18.7"
   },
   "devDependencies": {
-    "@koishijs/client": "^5.30.5",
-    "@koishijs/plugin-console": "^5.30.5",
-    "@vueuse/core": "^12.7.0",
-    "cosmokit": "^1.7.2",
+    "@koishijs/client": "^5.30.7",
+    "@koishijs/plugin-console": "^5.30.7",
+    "@vueuse/core": "^13.1.0",
+    "cosmokit": "^1.8.0",
     "koishi-plugin-wallpaper": "^1.0.5",
-    "octokit": "^4.1.2",
-    "prettier": "^3.5.2",
+    "octokit": "^4.1.3",
+    "prettier": "^3.5.3",
     "semaphore-promise": "^1.4.2",
     "tsx": "^4.19.3",
-    "typescript": "^5.8.2",
+    "typescript": "^5.8.3",
     "vue": "^3.5.13"
   }
 }
