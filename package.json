@@ -50,14 +50,14 @@
   },
   "devDependencies": {
     "@koishijs/client": "^5.30.9",
-    "@vueuse/core": "^13.5.0",
+    "@vueuse/core": "^13.6.0",
     "cosmokit": "^1.8.0",
     "octokit": "^5.0.3",
     "prettier": "^3.6.2",
     "semaphore-promise": "^1.4.3",
-    "tsx": "^4.20.3",
-    "typescript": "^5.8.3",
-    "vue": "^3.5.17"
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2",
+    "vue": "^3.5.18"
   },
   "optionalDependencies": {
     "koishi-plugin-wallpaper": "^1.0.5"
